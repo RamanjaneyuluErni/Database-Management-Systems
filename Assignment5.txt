@@ -1,0 +1,159 @@
+
+create table instructor(FIRST_NAME varchar2(10),LAST_NAME varchar2(10),STREET varchar2(10),CITY varchar2(10),STATE varchar2(10),ZIP_CODE_INFORMATION number(3),SECTIONS number(3));              ID
+
+
+1. Create a package specification and the body for a package named School_api(). The package contains the procedure Get_name_addressi() and the function Instructor_status().
+Get_name_addressi(): The procedure should accept two parameters to hold a table name and an ID and should return six parameters with first name, last name, street, city, state, and zip code information
+Instroctor_status(): For a given instructor, determine how many sections he or she is teaching. If the number is greater than or equal to 3, return a message saying that the instructor needs a vacation. Otherwise, return a message saying how many sections this instructor is teaching.
+
+Package:
+
+create or replace package School_api as
+procedure Get_name_address(v_id number);
+function Instroctor_status(v_id number) return VARCHAR2;
+end School_api;
+
+Package body:
+create or replace package body School_api as
+
+procedure Get_name_address(v_id in number) is
+temp_record instructor%rowtype;
+begin
+select * into temp_record
+from instructor
+where instructor.id= v_id;
+dbms_output.put_line(temp_record.first_name||' '||temp_record.last_name||' '||temp_record.street||' '||temp_record.city||' '||temp_record.state||' '||temp_record.zip_code_information);
+end Get_name_address;
+
+function Instroctor_status(v_id in number)
+return VARCHAR2 as
+msg VARCHAR2(20);
+num number(3);
+begin
+select sections into num
+from instructor
+where instructor.id=v_id;
+if num>2 then msg:='needs a vacation';
+else msg:=to_char(num,'999');
+end if;
+return msg;
+end Instroctor_status;
+end School_api;
+
+Query:
+
+set serveroutput on;
+
+declare
+s_id number(3);
+i_name varchar2(10);
+text varchar2(20);
+
+begin
+s_id:=&Enter_student_id;
+
+school_api.get_name_address(s_id);
+text:= school_api.instroctor_status(s_id);
+dbms_output.put_line(text);
+end;
+
+Output:
+
+anonymous block completed
+d d d d d 456
+needs a vacation
+
+_______________________________________________________________________________________________________________________________________________________________________
+
+2. Add a procedure to the school_api package called remove_student. This procedure accepts a student_id and returns nothing. Based on the student ID passed in, it removes the student from the database. If the student does not exist or if a problem occurs while removing the student (such as a foreign key constraint violation), let the calling program handle it.
+
+Package:
+
+create or replace package School_api as
+procedure Get_name_address(v_id number);
+function Instroctor_status(v_id number) return VARCHAR2;
+procedure remove_student(student_id in NUMBER);
+end School_api;
+
+Package body:
+
+create or replace package body School_api as
+
+procedure Get_name_address(v_id in number) is
+temp_record instructor%rowtype;
+begin
+select * into temp_record
+from instructor
+where instructor.id= v_id;
+dbms_output.put_line(temp_record.first_name||' '||temp_record.last_name||' '||temp_record.street||' '||temp_record.city||' '||temp_record.state||' '||temp_record.zip_code_information);
+end Get_name_address;
+
+function Instroctor_status(v_id in number)
+return VARCHAR2 as
+msg VARCHAR2(20);
+num number(3);
+begin
+select sections into num
+from instructor
+where instructor.id=v_id;
+if num>2 then msg:='needs a vacation';
+else msg:=to_char(num,'999');
+end if;
+return msg;
+end Instroctor_status;
+
+procedure remove_student(student_id in NUMBER) as
+begin
+delete from instructor where instructor.id= student_id;
+dbms_output.put_line('deleted');
+end remove_student;
+end school_api;
+
+
+Query:
+
+set serveroutput on;
+
+declare
+student_id number(3);
+f_name VARCHAR2(10);
+
+begin
+student_id:=&student_id;
+school_api.remove_student(student_id);
+
+end;
+
+Output:
+
+anonymous block completed
+deleted
+_______________________________________________________________________________________________________________________________________________________________________
+
+3. Alter remove_student in the school_api package body to accept an additional parameter. This new parameter should be a VARCHAR2 and should be called p_ri. Make p_ri default to R. The new parameter may contain a value of R or C. If R is received, it represents DELETE RESTRICT, and the procedure acts as it does now. If there are enrollments for the student, the delete is disallowed. If a C is received, it represents DELETE CASCADE. This functionally means that the remove_student procedure locates all records for the student in all the Student Database tables. It removes them from the database before attempting to remove the student from the student table. Decide how to handle the situation when the user passes in a code other than C or R.
+
+Package:
+
+create or replace package school_api as
+procedure remove_student(student_id in NUMBER,p_ri in VARCHAR2);
+end school_api;
+
+Package body:
+
+create or replace package body school_api as
+
+procedure remove_student (student_number in NUMBER,p_ri in VARCHAR2) as
+
+begin
+if p_ri='C' THEN 
+delete from instructor where instructor.id=student_id;
+dbms_output.put_line('Deleted');
+else
+dbms_output.put_line('Not Deleted');
+end if;
+
+end remove_student;
+end school_api;
+
+Output:
+

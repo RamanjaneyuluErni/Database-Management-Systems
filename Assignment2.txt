@@ -1,0 +1,37 @@
+1. Find the book number, book name, and number of pages of all the books published by London Publishing Ltd. List the results in order by book name.
+
+select booknumber, bookname, pagee FROM book where publishername='london' ORDER BY bookname;
+
+BOOKNUMBER             BOOKNAME   PAGEE                  
+---------------------- ---------- ---------------------- 
+20                     a          450                    
+21                     b          350    
+
+2. How many books of at least 400 pages does Good Reading Bookstores carry that were published by publishers based in Paris, France?
+
+select count(booknumber)
+from publisher, book
+where publisher.publishername=book.publishername and pagee>=400 and city='paris';
+
+COUNT(BOOKNUMBER)      
+---------------------- 
+1
+
+3. List the publishers in Belgium, Brazil, and Singapore that publish books written by authors who were born before 1920.
+
+select publisher.publishername
+from publisher,book
+where publisher.publishername=book.publishername and (city='belgium' or city='berlin' or city='singapore') and
+book.bookname=(select booknumber from writing, author
+where writing.authornumber=author.authornumber and dob<1920);
+
+4. How many books did each publisher in India, Norway; Nairobi, Kenya; and Auckland, New Zealand, publish in 2001?
+
+select count(book.publishername)
+from publisher,book
+where publisher.publishername=book.publishername and book.publisheryear=2001;
+
+COUNT(BOOK.PUBLISHERNAME) 
+------------------------- 
+2
+

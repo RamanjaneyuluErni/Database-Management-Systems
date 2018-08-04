@@ -1,0 +1,309 @@
+1. Write the PL/SQL script to display the employee_name, job, salary and department_number from the employee table.
+
+QUERY:
+
+SET SERVEROUTPUT ON
+
+DECLARE
+CURSOR EMP_DETAILS IS
+SELECT * FROM emp_ass4;
+EMP_RECORD EMP_ASS4%ROWTYPE;
+
+BEGIN
+OPEN EMP_DETAILS;
+LOOP
+FETCH EMP_DETAILS INTO EMP_RECORD;
+EXIT WHEN EMP_DETAILS%NOTFOUND;
+dbms_output.put_line(EMP_RECORD.E_NAME||'  '||EMP_RECORD.E_JOB||'  '||EMP_RECORD.SALARY||'  '||EMP_RECORD.DEPT_NO);
+END LOOP ;
+CLOSE EMP_DETAILS;
+END;
+
+OUTPUT:
+
+SHIVA  DOCTOR  10000  123
+BHARATH  ENGINEER  10000  124
+MANOJ  ENGINEER  15000  124
+RAGHAV  DOCTOR  20000  123
+
+2. Write a PL/SQL script to increase the salary as per following criteria:
+SALARY AMT INCREMENTED BY
+<1200 8%
+<2500 12%
+<4500 15%
+OTHERWISE 20%
+
+QUERY:
+
+SET SERVEROUTPUT ON
+
+DECLARE
+CURSOR EMP_DETAIL IS
+SELECT * FROM emp_ass4;
+MUL NUMBER(2,2);
+
+BEGIN
+
+
+FOR EMP_RECORD IN EMP_DETAIL LOOP
+
+IF EMP_RECORD.SALARY<1200
+  THEN MUL:=0.08;
+ELSIF EMP_RECORD.SALARY<2500
+  THEN MUL:=0.12;
+ELSIF EMP_RECORD.SALARY<4500
+  THEN MUL:=0.15;
+ELSE
+  MUL:=0.2;
+END IF;
+
+UPDATE EMP_ASS4
+SET EMP_ASS4.SALARY = EMP_ASS4.SALARY + EMP_ASS4.SALARY * MUL
+WHERE EMP_ASS4.SALARY=EMP_RECORD.SALARY;
+
+END LOOP;
+
+END;
+
+OUTPUT:
+
+SHIVA      DOCTOR     2509                   123                    
+BHARATH    ENGINEER   3968                   124                    
+MANOJ      ENGINEER   5520                   124                    
+RAGHAV     DOCTOR     7200                   123 
+
+3. Write the PL/SQL script to display the employee_name, job, salary of particular department that is input by user using parameter.
+
+QUERY:
+
+SET SERVEROUTPUT ON
+
+DECLARE
+CURSOR EMPCURSOR(DEPT emp_ass4.DEPT_NO%TYPE) IS 
+SELECT E_NAME,E_JOB,SALARY
+FROM emp_ass4
+WHERE dept_no=DEPT;
+DEPT VARCHAR2(3);
+
+BEGIN
+
+DEPT:=&DEPT_NUMBER;
+FOR EMP_RECORD IN EMPCURSOR(dept) LOOP
+dbms_output.put_line(EMP_RECORD.E_NAME||' '||EMP_RECORD.E_JOB||'  '||EMP_RECORD.SALARY);
+END LOOP;
+
+END;
+
+OUTPUT:
+
+SHIVA DOCTOR  2509
+RAGHAV DOCTOR  7200
+
+4. Write a PL/SQL script to display the name, salary and bonus (salary * .12) for each employee using cursor for loop.
+
+QUERY:
+
+SET SERVEROUTPUT ON
+
+DECLARE
+CURSOR EMPCURSOR IS 
+SELECT E_NAME,E_JOB,SALARY
+FROM emp_ass4;
+
+BEGIN
+
+FOR EMP_RECORD IN EMPCURSOR LOOP
+dbms_output.put_line(EMP_RECORD.E_NAME||' '||EMP_RECORD.E_JOB||'  '||EMP_RECORD.SALARY||' '||EMP_RECORD.SALARY*0.12);
+END LOOP;
+
+END;
+
+OUTPUT:
+
+SHIVA DOCTOR  2509 301.08
+BHARATH ENGINEER  3968 476.16
+MANOJ ENGINEER  5520 662.4
+RAGHAV DOCTOR  7200 864
+
+5. Write a PL/SQL procedure called Multi_table that take two numbers as parameter and display the product of first number till second number;
+
+QUERY:
+
+SET SERVEROUTPUT ON
+
+DECLARE
+NUM1 NUMBER(2);
+NUM2 NUMBER(2);
+PRODUCT NUMBER(5);
+
+PROCEDURE MULTI_TABLE(NUM1 IN NUMBER,NUM2 IN NUMBER,PRODUCT IN OUT NUMBER) IS
+BEGIN
+product:=PRODUCT* num1;
+IF NUM1=NUM2 
+THEN dbms_output.put_line('Product '|| product);
+ELSE MULTI_TABLE(NUM1+1,NUM2,PRODUCT);
+END IF;
+END;
+
+BEGIN
+
+NUM1:=&FIRST_NUMBER;
+NUM2:=&SECOND_NUMBER;
+product:=1;
+MULTI_TABLE(NUM1, num2, product);
+
+END;
+
+OUTPUT:
+
+Product 720
+
+6. Write a PL/SQL procedure that take the department_number as parameter and display the name and salary of employees working in that department and return the sum of salary of such employees using out parameter.
+
+QUERY:
+
+SET SERVEROUTPUT ON;
+
+DECLARE
+V_DNO NUMBER(3);
+SAL_SUM NUMBER(6);
+CURSOR C_EMPLOYEE IS
+SELECT E_NAME,SALARY
+FROM employee
+WHERE d_no=V_DNO;
+E_RECORD C_EMPLOYEE%ROWTYPE;
+
+PROCEDURE DISPLAY(V_DNO IN NUMBER,SAL_SUM IN OUT NUMBER) IS
+BEGIN
+FOR E_RECORD IN C_EMPLOYEE LOOP
+dbms_output.put_line('NAME: '||E_RECORD.E_NAME||' SALARY: '||E_RECORD.SALARY);
+SAL_SUM :=SAL_SUM+E_RECORD.SALARY;
+END LOOP;
+END;
+
+BEGIN
+V_DNO:=&DEPT_NUMBER;
+SAL_SUM:=0;
+DISPLAY(V_DNO,SAL_SUM);
+dbms_output.put_line('TOTAL SALARY OF DEPT NUMBER '||V_DNO||' IS '||SAL_SUM);
+END;
+
+OUTPUT:
+
+NAME: NAR SALARY: 1500
+NAME: BUN SALARY: 1400
+TOTAL SALARY OF DEPT NUMBER 1 IS 2900
+
+7. Write a procedure raise_sal, which increases the salary of an employee. It accepts employee’s number and salary increment amount.
+
+QUERY:
+
+SET SERVEROUTPUT ON;
+
+DECLARE
+V_ENO NUMBER(3);
+V_SAL_INC NUMBER(6);
+
+PROCEDURE RAISE_SAL(V_ENO IN NUMBER,V_SAL_INC IN NUMBER) IS
+BEGIN
+UPDATE EMPLOYEE
+SET salary= salary+ v_sal_inc
+WHERE EMPLOYEE.e_no=V_ENO;
+END;
+
+BEGIN
+
+V_ENO :=&EMPLOYEE_ID;
+SELECT SALARY INTO V_SAL_INC
+FROM EMPLOYEE
+WHERE EMPLOYEE.e_no=V_ENO;
+dbms_output.put_line('SALARY BEFORE INCREMENT: '|| v_sal_inc);
+v_sal_inc:=&SALARY_INCREMENT;
+RAISE_SAL(V_ENO,V_SAL_INC);
+SELECT SALARY INTO V_SAL_INC
+FROM EMPLOYEE
+WHERE e_no=V_ENO;
+dbms_output.put_line('SALARY AFTER INCREMENT: '|| v_sal_inc);
+
+END;
+
+OUTPUT:
+
+SALARY BEFORE INCREMENT: 1500
+SALARY AFTER INCREMENT: 4000
+
+8. Write a PL/SQL function power that takes two numbers as arguments and returns the value of the first number raised to the power of the second.
+
+QUERY:
+
+SET SERVEROUTPUT ON;
+
+DECLARE
+NUM1 NUMBER(3);
+NUM2 NUMBER(3);
+FUNCTION FINDPOWER (NUM1 IN OUT NUMBER,NUM2 IN OUT NUMBER) 
+RETURN NUMBER
+IS
+PRO NUMBER;
+BEGIN
+PRO:=1;
+WHILE NUM2>0 LOOP
+PRO := PRO* num1;
+NUM2:=NUM2-1;
+END LOOP;
+RETURN PRO;
+END;
+
+BEGIN
+
+NUM1:=&BASE;
+NUM2:=&EXPONENT;
+NUM1:=FINDPOWER(NUM1,NUM2);
+dbms_output.put_line('RESULT: '||NUM1);
+
+END;
+
+OUTPUT:
+
+RESULT: 25
+
+10. Write a trigger that verifies the joining date when a new row is inserted in the Employee table. Joining date should be greater or equal to current date.
+
+Query:
+
+create or replace
+TRIGGER CHECKDATE
+AFTER
+INSERT
+ON EMPLOYEE
+FOR EACH ROW
+WHEN (NEW.HIREDATE < SYSDATE)
+BEGIN
+DELETE FROM employee WHERE e_no=:NEW.E_NO;
+END;
+
+INSERT INTO EMPLOYEE VALUES(122,'EMP',1200,'CSE',123,'12-FEB-17');
+
+Output:
+
+
+
+11. Write a trigger that is fired before any row is inserted in the Employee table.
+
+Query:
+
+create or replace TRIGGER INS_INTIMATE
+BEFORE
+INSERT
+ON EMPLOYEE
+BEGIN
+
+dbms_output.put_line('INSERTING.....');
+END;
+
+Output:
+
+1 rows inserted
+INSERTING.....
+
+

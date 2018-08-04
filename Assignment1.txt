@@ -1,0 +1,266 @@
+1. Find the commission percentage and year of hire of salesperson number 186.
+
+select commpercentage,yearhire from salesperson where salespersonnumber=186;
+
+COMMPERCENTAGE         YEARHIRE               
+---------------------- ---------------------- 
+24                     12091995               
+27                     12091998               
+21                     12091999               
+
+
+2. List the salesperson numbers and salesperson names of those salespersons who have a commission percentage of 10.
+
+select *
+from salesperson;
+select salespersonnumber,salespersonname
+from salesperson
+where commpercentage=10;
+
+SALESPERSONNUMBER      SALESPERSONNAME COMMPERCENTAGE         YEARHIRE               OFFICENUMBER           
+---------------------- --------------- ---------------------- ---------------------- ---------------------- 
+121                    narsi           10                     12091995               9059549960             
+122                    naari           20                     12091996               9059549960             
+123                    nar             25                     12091997               9059549960             
+124                    siva            20                     12091998               9059549960             
+125                    bunty           10                     12091999               9059549960             
+126                    shiva           25                     12091000               9059549960             
+
+6 rows selected
+
+SALESPERSONNUMBER      SALESPERSONNAME 
+---------------------- --------------- 
+121                    narsi           
+125                    bunty           
+
+2 rows selected
+
+3. List the salesperson number and salesperson name of all of the salespersons.
+
+select salespersonnumber,salespersonname
+from salesperson;
+
+SALESPERSONNUMBER      SALESPERSONNAME 
+---------------------- --------------- 
+121                    narsi           
+122                    naari           
+123                    nar             
+124                    siva            
+125                    bunty           
+126                    shiva           
+
+6 rows selected
+
+4. List the salesperson numbers, salesperson names, and commission percentages of the salespersons whose commission percentage is less than 12.
+
+select *
+from salesperson;
+select salespersonnumber,salespersonname, commpercentage "commission percentage"
+from salesperson
+where commpercentage<12;
+
+SALESPERSONNUMBER      SALESPERSONNAME COMMPERCENTAGE         YEARHIRE               OFFICENUMBER           
+---------------------- --------------- ---------------------- ---------------------- ---------------------- 
+121                    narsi           10                     12091995               9059549960             
+122                    naari           12                     12091996               9059549960             
+123                    nar             14                     12091997               9059549960             
+124                    siva            9                      12091998               9059549960             
+125                    bunty           40                     12091999               9059549960             
+126                    shiva           10                     12091000               9059549960             
+
+6 rows selected
+
+SALESPERSONNUMBER      SALESPERSONNAME commission percentage  
+---------------------- --------------- ---------------------- 
+121                    narsi           10                     
+124                    siva            9                      
+126                    shiva           10                     
+
+3 rows selected
+
+5. List the customer numbers and headquarters cities of the customers that have a customer number of at least 1700.
+
+select customernumber,headquartercity
+from customer
+where customernumber>=1700;
+
+CUSTOMERNUMBER         HEADQUARTERCITY 
+---------------------- --------------- 
+1991                     sec             
+1991                     std             
+1812                     gar             
+
+3 rows selected
+
+6. List the customer numbers, customer names, and headquarters cities of the customers that are headquartered in New York and that have a customer number higher than 1500.
+
+select customernumber,customername,headquartercity
+from customer where headquartercity='newyork' and customernumber>1500;
+
+CUSTOMERNUMBER         CUSTOMERNAME HEADQUARTERCITY 
+---------------------- ------------ --------------- 
+1560                   siva         newyork         
+
+1 rows selected
+
+7. ‘List the customer numbers, customer names, and headquarters cities of the customers that are headquartered in New York or that have a customer number higher than 1500.
+
+select customernumber,customername,headquartercity
+from customer where headquartercity='newyork' or customernumber>1500;
+
+CUSTOMERNUMBER         CUSTOMERNAME HEADQUARTERCITY 
+---------------------- ------------ --------------- 
+1210                   narsi        newyork         
+9100                   naaf         sec             
+1560                   siva         newyork         
+1205                   shigf        newyork         
+
+4 rows selected
+
+8. List the customer numbers, customer names, and headquarters cities of the customers that are headquartered in New York or that satisfy the two conditions of having a customer number higher than 1500 and being headquartered in Atlanta.
+
+select customernumber,customername,headquartercity
+from customer
+where headquartercity='newyork' or(customernumber>1500 and headquartercity='atlanta');
+
+CUSTOMERNUMBER         CUSTOMERNAME HEADQUARTERCITY 
+---------------------- ------------ --------------- 
+1210                   narsi        newyork         
+1200                   ndf          newyork         
+1560                   siva         atlanta         
+1491                   bungd        newyork         
+
+4 rows selected
+
+9.Which cities serve as headquarters cities for General Hardware customers?
+
+select headquartercity FROM customer
+where salespersonnumber=(select salespersonnumber FROM product,sales where product.productnumber=sales.productnumber);
+
+
+HEADQUARTERCITY      
+-------------------- 
+newyork              
+australia            
+atlanta              
+swiden               
+newyork              
+atlanta
+
+10. Find the customer numbers, customer names, and headquarters cities of those customers with customer numbers greater than 1000. List the results in alphabetic order by headquarters cities.
+
+select customernumber,customernames,headquartercity 
+FROM customer
+where customernumber>1000 order by headquartercity;
+
+CUSTOMERNUMBER         CUSTOMERNAME HEADQUARTERCITY      
+---------------------- ------------ -------------------- 
+1525                   ragav        atlanta              
+1500                   prabhakar    australia            
+1700                   narsimha     newyork              
+1800                   akhil        newyork              
+1600                   sumanth      swiden               
+
+11. Find the average number of units of the different products that Salesperson 137 sold (i.e., the average of the quantity values in the first three records of the SALES table).
+
+select avg(quantity)
+from sales
+where salespersonnumber=137;
+
+AVG(QUANTITY)          
+---------------------- 
+5000
+
+12. What is the largest number of units of Product Number 21765 that any individual salesperson has sold?
+
+select MAX(quantity)
+FROM sales
+where productnumber=21765;
+
+MAX(QUANTITY)          
+---------------------- 
+2000 
+
+13. How many salespersons have sold with Product Number 21765?
+
+select count(salespersonnumber)
+from sales
+where productnumber=21765;
+
+COUNT(SALESPERSONNUMBER) 
+------------------------ 
+1
+
+14. Find the total number of units of all products sold by each salesperson.
+
+select SUM(quantity)
+from sales
+GROUP BY salespersonnumber;
+
+SUM(QUANTITY)          
+---------------------- 
+4000                   
+5000                   
+3000                   
+6000                   
+6000                   
+2000
+
+15. Find the total number of units of all products sold by each salesperson whose salesperson number is at least 150.
+
+select SUM(quantity)
+from (select SUM(quantity) FROM sales group by salespersonnumber)>5000;
+
+SALESPERSONNUMBER      SUM(QUANTITY)          
+---------------------- ---------------------- 
+210                    4000                   
+200                    3000                   
+186                    6000                   
+150                    6000                   
+160                    2000
+
+16. Find the total number of units of all products sold by each salesperson whose salesperson number is at least 150.
+
+select SUM(quantity)
+from (select SUM(quantity) FROM sales group by salespersonnumber)>5000;
+
+SALESPERSONNUMBER      SUM(QUANTITY)          
+---------------------- ---------------------- 
+210                    4000                   
+200                    3000                   
+186                    6000                   
+150                    6000                   
+160                    2000
+
+18. Find the name of the salesperson responsible for Customer Number 1525.
+
+select salespersonname
+from salesperson, customer
+where salesperson.salespersonnumber=customer.salespersonnumber and customernumber=1525;
+
+SALESPERSONNAME 
+--------------- 
+shiva
+
+19. List the names of the products of which salesperson Adams has sold more than 2000 units.
+
+select productname
+from salesperson,sales,product
+where salesperson.salespersonnumber=sales.salespersonnumber and sales.productnumber=product.productnumber and salespersonname='adams' and quantity>2000;
+
+PRODUCTNAME          
+-------------------- 
+
+0 rows selected
+
+20. Which salespersons with salesperson numbers greater than 200 have the lowest commission percentage?’’ (We’ll identify salespersons by their salesperson number
+
+select salespersonname
+from salesperson
+where salespersonnumber>200 and commpercentage= (select min(commpercentage) FROM salesperson);
+
+SALESPERSONNAME 
+--------------- 
+
+0 rows selected
+
